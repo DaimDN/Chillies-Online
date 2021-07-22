@@ -1,9 +1,8 @@
-port:
-  5001
+server:
+  port:
+    5001
 
 spring:
   data:
     mongodb:
-      user: root
-      password: 0995
-      uri: mongodb+srv://root:<password>@cluster0.kc42y.mongodb.net/
+      uri: mongodb+srv://root:hafiz@cluster0.kc42y.mongodb.net/takeaway
