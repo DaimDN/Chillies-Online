@@ -1,0 +1,8 @@
+server:
+  port:
+    5002
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://root:hafiz@cluster0.kc42y.mongodb.net/takeaway
