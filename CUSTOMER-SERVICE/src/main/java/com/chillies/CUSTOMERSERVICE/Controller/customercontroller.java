@@ -5,6 +5,7 @@ import com.chillies.CUSTOMERSERVICE.Repository.customerRepository;
 import com.chillies.CUSTOMERSERVICE.Services.customerService;
 import com.chillies.CUSTOMERSERVICE.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +63,7 @@ public class customercontroller {
         else{
             HashMap<String, String> deleteMessage = new HashMap<>();
             deleteMessage.put("msg", "customer doesn't exist");
-            return ResponseEntity.ok().body(deleteMessage);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(deleteMessage);
         }
     }
 
