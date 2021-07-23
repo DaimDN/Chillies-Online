@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface customerRepository extends MongoRepository<Customer, String> {
 
     Optional<Customer> findById(String customerId);
+
+    Customer findByname(String name);
+
     LinkedList<Customer> findAll();
     @DeleteQuery
     void deleteCustomerById(String id);

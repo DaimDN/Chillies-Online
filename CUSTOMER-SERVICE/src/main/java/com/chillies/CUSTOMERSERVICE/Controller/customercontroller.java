@@ -1,6 +1,7 @@
 package com.chillies.CUSTOMERSERVICE.Controller;
 
 
+import com.chillies.CUSTOMERSERVICE.Repository.customerRepository;
 import com.chillies.CUSTOMERSERVICE.Services.customerService;
 import com.chillies.CUSTOMERSERVICE.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -17,6 +21,9 @@ public class customercontroller {
     @Autowired
     private customerService CustomerServices;
 
+    @Autowired
+    private customerRepository CustomerRepository;
+
 
     @GetMapping(path = "all", produces = "Application/json")
     public ResponseEntity<?> getALLListOfCustomer(){
@@ -24,11 +31,26 @@ public class customercontroller {
     }
 
     @PostMapping(path = "add", consumes = "Application/json", produces = "Application/json")
-    public ResponseEntity<HashMap<String, String>> addCustomer(@RequestBody Customer aCustomer){
-     CustomerServices.addCustomer(aCustomer);
-     HashMap<String, String> message = new HashMap<>();
-     message.put("msg", "customer has been added");
-     return  ResponseEntity.ok().body(message);
+    public ResponseEntity<?> addCustomer(@RequestBody Customer aCustomer){
+        List<Customer> allCustomers = CustomerServices.getAllCustomers();
+        Stream<Customer> checkForCustomer =  allCustomers.stream().filter(x -> {
+            return x.getName().equals(aCustomer.getName());
+
+        });
+        boolean customerAvailability;
+        customerAvailability = checkForCustomer.count() > 0;
+        if(!customerAvailability){
+            CustomerServices.addCustomer(aCustomer);
+            HashMap<String, String> message = new HashMap<>();
+            message.put("msg", "customer has been added");
+            return  ResponseEntity.ok().body(checkForCustomer);
+        }
+        else {
+            HashMap<String, String> message = new HashMap<>();
+            message.put("msg", "customer already exist");
+            return  ResponseEntity.ok().body(checkForCustomer);
+        }
+
     }
 
     @PostMapping(path = "delete", consumes = "Application/json", produces = "Application/json")
