@@ -10,9 +10,8 @@ import java.util.Optional;
 
 public interface staffRepository  extends MongoRepository<Staff, String > {
 
-    Optional<Staff> findById(String customerId);
+    Optional<Staff> findByUniqueCode(long uniqueCode);
 
-    Staff findByName(String name);
     LinkedList<Staff> findAll();
 
     @DeleteQuery
