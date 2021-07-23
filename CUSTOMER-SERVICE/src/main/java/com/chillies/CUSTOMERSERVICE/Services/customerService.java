@@ -36,10 +36,8 @@ public class customerService {
     }
 
     public Customer updateCustomer(Customer customer) throws NoSuchElementException {
-        Optional<Customer> aCustomer =  CustomerRepository.findById(customer.getId());
-        Customer newCustomer = aCustomer.get();
-        CustomerRepository.save(newCustomer);
-        return newCustomer;
+        CustomerRepository.save(customer);
+        return customer;
     }
 
 }

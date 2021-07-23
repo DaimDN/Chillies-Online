@@ -34,26 +34,23 @@ public class customercontroller {
     public ResponseEntity<?> addCustomer(@RequestBody Customer aCustomer){
         List<Customer> allCustomers = CustomerServices.getAllCustomers();
         Stream<Customer> checkForCustomer =  allCustomers.stream().filter(x -> {
-            return x.getName().equals(aCustomer.getName());
-
+            return x.getName().equals(aCustomer.getName()) && x.getPostcode().equals(aCustomer.getPostcode()) && x.getTelno().equals(aCustomer.getTelno());
         });
-        boolean customerAvailability;
-        customerAvailability = checkForCustomer.count() > 0;
-        if(!customerAvailability){
-            CustomerServices.addCustomer(aCustomer);
-            HashMap<String, String> message = new HashMap<>();
-            message.put("msg", "customer has been added");
-            return  ResponseEntity.ok().body(checkForCustomer);
-        }
-        else {
-            HashMap<String, String> message = new HashMap<>();
+        HashMap<String, String> message = new HashMap<>();
+        if(checkForCustomer.count() > 0){
             message.put("msg", "customer already exist");
-            return  ResponseEntity.ok().body(checkForCustomer);
+            message.put("type", "error");
+            return ResponseEntity.ok().body(message);
         }
-
+        else{
+            CustomerServices.addCustomer(aCustomer);
+            message.put("msg", "customer has been saved");
+            message.put("type", "success");
+            return ResponseEntity.ok().body(message);
+        }
     }
 
-    @PostMapping(path = "delete", consumes = "Application/json", produces = "Application/json")
+    @DeleteMapping(path = "delete", consumes = "Application/json", produces = "Application/json")
     public ResponseEntity<?> deleteCustomer (@RequestBody String customerId){
         Optional<Customer> aCustomer = CustomerServices.findACustomer(customerId);
         if(aCustomer.isPresent()){
@@ -72,28 +69,31 @@ public class customercontroller {
 
     @PatchMapping(path = "update", consumes = "Application/json", produces = "Application/json")
     public ResponseEntity<?> updateCustomer (@RequestBody Customer customer){
-        Optional<Customer> aCustomer = CustomerServices.findACustomer(customer.getId());
-        if(aCustomer.isPresent()){
+        Optional<Customer> foundCustomer = CustomerRepository.findById(customer.getId());
+        HashMap<String, String> message = new HashMap<>();
+        if(!foundCustomer.isPresent()){
+            message.put("msg", "customer doesnt't exist");
+            message.put("type", "not found");
+            return ResponseEntity.badRequest().body(message);
+        }else{
             CustomerServices.updateCustomer(customer);
-            HashMap<String, String> UpdateMessage = new HashMap<>();
-            UpdateMessage.put("msg", "customer has been updated");
-            return ResponseEntity.ok().body(UpdateMessage);
-        }
-        else{
-            HashMap<String, String> deleteMessage = new HashMap<>();
-            deleteMessage.put("msg", "customer doesn't exist");
-            return ResponseEntity.ok().body(deleteMessage);
+            message.put("msg", "customer has been updated");
+            message.put("type", "success");
+            return  ResponseEntity.ok().body(message);
         }
 
     }
 
-    @GetMapping(path="find/{id}", consumes = "Application/json", produces = "Application/json")
-    public ResponseEntity<?> findCustomer(@PathVariable("id") String customerId){
-        Optional<Customer> founded = CustomerServices.findACustomer(customerId);
-        HashMap<String,Optional<Customer>> messageBox = new HashMap<>();
-        messageBox.put("Customer" , founded);
-        return ResponseEntity.ok().body(messageBox);
+
+    @GetMapping(path = "find/{id}", produces = "Application/json")
+        public ResponseEntity<?> findaCustomer(@PathVariable String id){
+        Optional<Customer> customer = CustomerRepository.findById(id);
+        HashMap<String, String> message = new HashMap<>();
+        if(customer.isEmpty()) {
+            message.put("msg", "customer is not available");
+            message.put("type", "not found");
+            return ResponseEntity.badRequest().body(message);}
+        return ResponseEntity.ok().body(customer);
+
     }
-
-
 }
